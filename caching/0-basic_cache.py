@@ -3,9 +3,9 @@
 
 from base_caching import BaseCaching
 
+
 class BasicCache(BaseCaching):
     """ Classe de cache de base qui hérite de BaseCaching """
-    
     def put(self, key, item):
         """
         Assigne l'élément à la clé donnée dans le cache
