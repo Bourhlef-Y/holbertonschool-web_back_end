@@ -37,7 +37,7 @@ def filter_datum(
 
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class
-    """
+        """
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
@@ -48,20 +48,6 @@ class RedactingFormatter(logging.Formatter):
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format the log record by redacting sensitive fields"""
-        record.msg = filter_datum(self.fields, self.REDACTION,
-                                record.getMessage(), self.SEPARATOR)
+        """Format le message de log en filtrant les champs sensibles"""
+        record.msg = filter_datum(self.fields, self.REDACTION, record.getMessage(), self.SEPARATOR)
         return super().format(record)
-
-
-def get_logger() -> logging.Logger:
-    """Returns a logging.Logger object"""
-    logger = logging.getLogger("user_data")
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(RedactingFormatter(fields=("email", "phone", "ssn", "password")))
-    logger.addHandler(stream_handler)
-    
-    return logger
