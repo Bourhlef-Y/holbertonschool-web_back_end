@@ -44,5 +44,3 @@ def forbidden():
         403: Forbidden error for testing purposes
     """
     abort(403)
-
-
