@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-Route module for the API.
-This module contains the main Flask application and error handlers.
+Route module for the API
 """
 from os import getenv
 from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
-from flask_cors import (CORS, cross_origin)
+from flask_cors import CORS
 import os
-
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
@@ -17,32 +15,21 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 @app.errorhandler(404)
 def not_found(error) -> str:
-    """ Not found handler
-    Returns:
-        dict: Error message
-        int: HTTP status code 404
-    """
+    """ Not found handler """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(401)
 def unauthorized(error) -> str:
-    """ Unauthorized handler
-    Returns:
-        dict: Error message
-        int: HTTP status code 401
-    """
+    """ Unauthorized handler """
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden(error) -> str:
-    """ Forbidden handler - Handles authentication failures
-    Returns:
-        dict: Error message
-        int: HTTP status code 403
-    """
+    """ Forbidden handler """
     return jsonify({"error": "Forbidden"}), 403
+
 
 
 if __name__ == "__main__":
