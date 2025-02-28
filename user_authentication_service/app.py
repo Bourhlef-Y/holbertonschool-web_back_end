@@ -5,7 +5,7 @@ Ce module implémente une API REST pour l'authentification des utilisateurs.
 Il fournit des routes pour l'enregistrement, la connexion et la gestion
 des sessions utilisateur.
 """
-from flask import Flask, jsonify, request, abort, make_response
+from flask import Flask, jsonify, request, abort, make_response, redirect
 from auth import Auth
 
 
@@ -59,6 +59,23 @@ def login() -> str:
     )
     response.set_cookie('session_id', session_id)
     return response
+
+
+@app.route('/sessions', methods=['DELETE'])
+def logout() -> str:
+    """Route DELETE pour déconnecter un utilisateur.
+
+    Returns:
+        str: Redirection vers la page d'accueil
+    """
+    session_id = request.cookies.get('session_id')
+    user = AUTH.get_user_from_session_id(session_id)
+
+    if user is None:
+        abort(403)
+
+    AUTH.destroy_session(user.id)
+    return redirect('/')
 
 
 if __name__ == "__main__":
