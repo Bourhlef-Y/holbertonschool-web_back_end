@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-"""Module de l'application Flask
+"""Module de l'application Flask.
+
+Ce module implémente une API REST pour l'authentification des utilisateurs.
+Il fournit des routes pour l'enregistrement, la connexion et la gestion
+des sessions utilisateur.
 """
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, make_response
 from auth import Auth
 
 
@@ -10,14 +14,22 @@ AUTH = Auth()
 
 
 @app.route('/', methods=['GET'])
-def welcome():
-    """Route GET racine qui retourne un message de bienvenue"""
+def welcome() -> str:
+    """Route GET racine qui retourne un message de bienvenue.
+
+    Returns:
+        str: JSON contenant le message de bienvenue
+    """
     return jsonify({"message": "Bienvenue"})
 
 
 @app.route('/users', methods=['POST'])
-def users():
-    """Route POST pour enregistrer un nouvel utilisateur"""
+def users() -> str:
+    """Route POST pour enregistrer un nouvel utilisateur.
+
+    Returns:
+        str: JSON avec le statut de l'opération
+    """
     email = request.form.get('email')
     password = request.form.get('password')
 
@@ -26,6 +38,27 @@ def users():
         return jsonify({"email": email, "message": "user created"})
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
+
+
+@app.route('/sessions', methods=['POST'])
+def login() -> str:
+    """Route POST pour la connexion d'un utilisateur.
+
+    Returns:
+        str: JSON avec le statut de la connexion
+    """
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if not AUTH.valid_login(email, password):
+        abort(401)
+
+    session_id = AUTH.create_session(email)
+    response = make_response(
+        jsonify({"email": email, "message": "logged in"})
+    )
+    response.set_cookie('session_id', session_id)
+    return response
 
 
 if __name__ == "__main__":
