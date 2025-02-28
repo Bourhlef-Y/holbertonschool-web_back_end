@@ -40,14 +40,15 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """Trouve un utilisateur dans la base de données en utilisant les arguments fournis
-        
+        """Trouve un utilisateur dans la base de données en utilisant
+        les arguments fournis
+
         Args:
             **kwargs: Arguments de filtrage arbitraires
-            
+
         Returns:
             User: L'utilisateur trouvé
-            
+
         Raises:
             NoResultFound: Si aucun utilisateur n'est trouvé
             InvalidRequestError: Si les arguments de recherche sont invalides
