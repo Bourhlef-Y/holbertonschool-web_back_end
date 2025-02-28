@@ -38,3 +38,24 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
+
+    def find_user_by(self, **kwargs) -> User:
+        """Trouve un utilisateur dans la base de données en utilisant les arguments fournis
+        
+        Args:
+            **kwargs: Arguments de filtrage arbitraires
+            
+        Returns:
+            User: L'utilisateur trouvé
+            
+        Raises:
+            NoResultFound: Si aucun utilisateur n'est trouvé
+            InvalidRequestError: Si les arguments de recherche sont invalides
+        """
+        try:
+            user = self._session.query(User).filter_by(**kwargs).first()
+            if user is None:
+                raise NoResultFound
+            return user
+        except InvalidRequestError as e:
+            raise e
