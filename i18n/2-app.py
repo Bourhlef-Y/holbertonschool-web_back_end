@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Basic Flask app module with Babel configuration and locale selector"""
+"""
+Flask app with Babel and locale selection
+"""
 from flask import Flask, render_template, request
 from flask_babel import Babel
 
@@ -13,28 +15,21 @@ class Config:
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 babel = Babel()
 
 
-def get_locale() -> str:
-    """
-    Determine the best match with supported languages
-    Returns:
-        str: Best matched language
-    """
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+def get_locale():
+    """Determine the best match for supported languages"""
+    return request.accept_languages.best_match(app.config["LANGUAGES"])
 
 
 babel.init_app(app, locale_selector=get_locale)
 
 
 @app.route('/')
-def index() -> str:
-    """
-    Renders the index page
-    Returns:
-        str: Rendered template for index page
-    """
+def index():
+    """Renders the homepage"""
     return render_template('2-index.html')
 
 

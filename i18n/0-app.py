@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Basic Flask app module"""
+"""
+Basic Flask app
+"""
 from flask import Flask, render_template
-
 
 app = Flask(__name__)
 
 
 @app.route('/')
-def index() -> str:
-    """
-    Renders the index page
-    Returns:
-        str: Rendered template for index page
-    """
+def index():
+    """Renders the homepage"""
     return render_template('0-index.html')
 
 
