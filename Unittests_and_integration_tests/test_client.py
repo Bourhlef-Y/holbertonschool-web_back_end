@@ -40,3 +40,23 @@ class TestGithubOrgClient(unittest.TestCase):
                 test_client._public_repos_url,
                 known_payload["repos_url"]
             )
+
+    @patch('client.get_json')
+    def test_public_repos(self, mock_get_json) -> None:
+        """Test que public_repos retourne la liste attendue de repos"""
+        test_payload = [
+            {"name": "repo1"},
+            {"name": "repo2"},
+        ]
+        mock_get_json.return_value = test_payload
+
+        with patch(
+            'client.GithubOrgClient._public_repos_url',
+            new_callable=property,
+            return_value='https://api.github.com/orgs/test/repos'
+        ):
+            test_client = GithubOrgClient("test")
+            result = test_client.public_repos()
+
+            self.assertEqual(result, ["repo1", "repo2"])
+            mock_get_json.assert_called_once()
