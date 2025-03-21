@@ -32,6 +32,38 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """
+    Décorateur qui stocke l'historique des appels d'une méthode.
+
+    Args:
+        method: La méthode à décorer
+
+    Returns:
+        Callable: La méthode décorée avec historique des appels
+    """
+    @wraps(method)
+    def wrapper(self, *args):
+        """
+        Wrapper qui stocke les entrées et sorties de la méthode.
+        """
+        # Clés pour stocker les entrées et sorties
+        inputs_key = f"{method.__qualname__}:inputs"
+        outputs_key = f"{method.__qualname__}:outputs"
+        
+        # Stockage des arguments d'entrée
+        self._redis.rpush(inputs_key, str(args))
+        
+        # Exécution de la méthode originale
+        output = method(self, *args)
+        
+        # Stockage de la sortie
+        self._redis.rpush(outputs_key, output)
+        
+        return output
+    return wrapper
+
+
 class Cache:
     """
     Classe Cache qui gère une instance Redis pour le stockage de données.
@@ -50,6 +82,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Stocke les données dans Redis avec une clé générée aléatoirement.
