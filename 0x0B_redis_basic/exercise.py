@@ -5,6 +5,31 @@ Module pour la gestion du cache Redis
 import redis
 import uuid
 from typing import Union, Callable, Optional
+from functools import wraps
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+    Décorateur qui compte le nombre d'appels à une méthode.
+
+    Args:
+        method: La méthode à décorer
+
+    Returns:
+        Callable: La méthode décorée avec compteur d'appels
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Wrapper qui incrémente le compteur avant d'appeler la méthode.
+        """
+        # Utilise le nom qualifié de la méthode comme clé
+        key = method.__qualname__
+        # Incrémente le compteur
+        self._redis.incr(key)
+        # Exécute la méthode originale
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -24,6 +49,7 @@ class Cache:
         # Nettoyage de la base de données Redis au démarrage
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Stocke les données dans Redis avec une clé générée aléatoirement.
@@ -49,26 +75,28 @@ class Cache:
         # Retour de la clé pour référence future
         return key
 
-    def get(self, 
+    def get(self,
             key: str,
             fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
         """
-        Récupère les données stockées dans Redis et les convertit si nécessaire.
+        Récupère les données stockées dans Redis et
+        les convertit si nécessaire.
 
         Args:
             key: La clé pour récupérer les données
             fn: Fonction optionnelle pour convertir les données
 
         Returns:
-            Les données converties selon la fonction fournie ou les données brutes
+            Les données converties selon la fonction
+            fournie ou les données brutes
         """
         # Récupération des données de Redis
         data = self._redis.get(key)
-        
+
         # Si aucune donnée n'est trouvée, retourne None
         if data is None:
             return None
-        
+
         # Si une fonction de conversion est fournie, l'applique
         return fn(data) if fn else data
 
